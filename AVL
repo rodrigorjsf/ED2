@@ -25,23 +25,45 @@ typedef struct noAvl {
 	struct noAvl * esq, * dir;
 	int fatbal;
 }noAVL;
+
+int cont = 0; //contador de nós na arvore - variavel global ou nao - usar na queue para fazer a busca por nivel
+
+void percorrerPorNivel(noAVL * raiz) {   //percorrer por nivel - implementar funções de queue
+   Queue fila;
+   noAVL * aux;
+   if (raiz != NULL) {
+     initialize(&fila);
+     enqueue (fila,raiz);
+
+     while (isEmpty(fila) == false) {
+         aux = dequeue(fila);
+         if (aux->esq != NULL)
+            enqueue(fila,aux->esq);
+         if (aux->dir != NULL)
+            enqueue(fila,aux->dir);
+            printf(“%i \n”, aux->info);
+          }
+     }
+}
+
 noAVL * CriarNo (char codigo[]){
 	noAVL *raiz;
 	char info [100];
 	raiz = (noAVL *)malloc(sizeof(noAVL));
-	raiz->cod = codigo;
+	raiz->cod = codigo;                               //certo?
 	raiz->esq = NULL;
 	raiz->dir = NULL;
 	raiz->fatbal = 0;
 	printf("Descreva o produto: \n");
-	fgets (info, sizeof(info), stdin);
-	raiz->desc = info;
+	fgets (info, sizeof(info), stdin);                 //certo?
+	raiz->desc = info;                                 //certo?
 	return raiz;
 }
-void inserir (noAVL **raiz,char codigo[], int *status){
+void inserir (noAVL **raiz,char codigo[], int *status, int *cont){
 	if (*raiz == NULL){
 		*raiz = CriarNo (codigo);
 		*status = 1;
+		*cont++
 	}
 	else if (strcmp(codigo, (*raiz)->cod) == 0) { // tirar duvida (*raiz)->cod  e não raiz->cod
 		printf ("Codigo de produto repetido! \n");
@@ -80,6 +102,7 @@ int main (){
 	char op;
 	char cod[10];
 	int status = 0;
+	
 	do {
 		printf ("1- Inserir \n2 - Remover \n3- Exibir \n4- Alterar \n5- Listar \n6- Sair \n");
 		printf ("imforme a opcao: ");
@@ -87,7 +110,7 @@ int main (){
 		switch(op){
 		case '1': printf ("Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-		          inserir (&arvoreAvl, cod, &status);
+		          inserir (&arvoreAvl, cod, &status, &cont);
 		          break;
 		case '2': printf ("Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
@@ -112,3 +135,4 @@ int main (){
 	system ("pause");
 	return 0;
 }
+
