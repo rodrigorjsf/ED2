@@ -1,0 +1,114 @@
+/*
+ ============================================================================
+ Name        : AVL.c
+ Author      : Rodrigo
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+2 *  Arvore AVL
+ *  (Adelson-Velskii e Landis)
+ *
+ *  Fator de balanceamento = hdir - hesq
+ *
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef struct noAvl {
+	char cod [10], desc [100];
+	float preco;
+	int estoque;
+	struct noAvl * esq, * dir;
+	int fatbal;
+}noAVL;
+noAVL * CriarNo (char codigo[]){
+	noAVL *raiz;
+	char info [100];
+	raiz = (noAVL *)malloc(sizeof(noAVL));
+	raiz->cod = codigo;
+	raiz->esq = NULL;
+	raiz->dir = NULL;
+	raiz->fatbal = 0;
+	printf("Descreva o produto: \n");
+	fgets (info, sizeof(info), stdin);
+	raiz->desc = info;
+	return raiz;
+}
+void inserir (noAVL **raiz,char codigo[], int *status){
+	if (*raiz == NULL){
+		*raiz = CriarNo (codigo);
+		*status = 1;
+	}
+	else if (strcmp(codigo, (*raiz)->cod) == 0) { // tirar duvida (*raiz)->cod  e não raiz->cod
+		printf ("Codigo de produto repetido! \n");
+		return;
+	}
+	else if (strcmp(codigo, (*raiz)->cod) < 0) {
+		inserir (&(*raiz)->esq, codigo, status);
+		     if (*status == 1)
+		       switch ((*raiz)->fatbal) {
+		         case 1 : (*raiz)->fatbal = 0;
+		                  *status = 0;
+		                  break;
+		         case 0 : (*raiz)->fatbal = -1;
+		                  break;
+		         case -1 : rotacaoDir(raiz, status);
+		                   break;
+		       }
+	}
+	else {
+		inserir (&(*raiz)->dir, codigo, status);
+		     if (*status == 1);
+		       switch ((*raiz)->fatbal) {
+		       case -1 : (*raiz)->fatbal = 0;
+		                *status = 0;
+		                break;
+		       case 0 : (*raiz)->fatbal = 1;
+                        break;
+		       case 1 : rotacaoEsq(raiz, status);
+                        break;
+		}
+	}
+}
+
+int main (){
+	noAVL * arvoreAvl = NULL;
+	char op;
+	char cod[10];
+	int status = 0;
+	do {
+		printf ("1- Inserir \n2 - Remover \n3- Exibir \n4- Alterar \n5- Listar \n6- Sair \n");
+		printf ("imforme a opcao: ");
+		op = getchar(); fflush(stdin);
+		switch(op){
+		case '1': printf ("Imforme o codigo: ");
+		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
+		          inserir (&arvoreAvl, cod, &status);
+		          break;
+		case '2': printf ("Imforme o codigo: ");
+		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
+                  remover (&arvoreAvl, cod);
+                  break;
+		case '3': printf ("Imforme o codigo: ");
+		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
+                  exibir (&arvoreAvl, cod, &status);
+                  break;
+		case '4': printf ("Imforme o codigo: ");
+                  fgets(cod, sizeof(cod), stdin); fflush (stdin);
+                  alterar (&arvoreAvl, cod, &status);
+                  break;
+		case '5': porNivel (arvoreAvl);
+                  break;
+		case '6': removerTodos (&arvoreAvl);
+                  break;
+		default:  printf ("Opcao invalida \n");
+		}
+
+	}while (op =! '6');
+	system ("pause");
+	return 0;
+}
