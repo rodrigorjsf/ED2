@@ -50,13 +50,13 @@ noAVL * CriarNo (char codigo[]){
 	noAVL *raiz;
 	char info [100];
 	raiz = (noAVL *)malloc(sizeof(noAVL));
-	raiz->cod = codigo;                               //certo?
+	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;                               
 	raiz->esq = NULL;
 	raiz->dir = NULL;
 	raiz->fatbal = 0;
 	printf("Descreva o produto: \n");
-	fgets (info, sizeof(info), stdin);                 //certo?
-	strcpy(raiz->desc, info);                          //raiz->desc = info;                                 //certo?
+	fgets (info, sizeof(info), stdin);                 
+	strcpy(raiz->desc, info);                          //raiz->desc = info;               
 	printf("Digite o preco do produto: \n");
 	scanf("%f", &raiz->preco); fflush (stdin);
 	printf("Quantidade do produto em estoque: \n");
