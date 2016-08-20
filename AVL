@@ -56,7 +56,11 @@ noAVL * CriarNo (char codigo[]){
 	raiz->fatbal = 0;
 	printf("Descreva o produto: \n");
 	fgets (info, sizeof(info), stdin);                 //certo?
-	raiz->desc = info;                                 //certo?
+	strcpy(raiz->desc, info);                          //raiz->desc = info;                                 //certo?
+	printf("Digite o preco do produto: \n");
+	scanf("%f", &raiz->preco); fflush (stdin);
+	printf("Quantidade do produto em estoque: \n");
+	scanf("%d", &raiz->estoque); fflush (stdin);
 	return raiz;
 }
 void inserir (noAVL **raiz,char codigo[], int *status, int *cont){
