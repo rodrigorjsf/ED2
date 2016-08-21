@@ -53,6 +53,8 @@ void LLRem(noAVL** r);
 
 void inserir (noAVL **raiz,char codigo[], int *status);
 
+void remover(noAVL **raiz, int elem);
+
 void removeAll(noAVL **raiz);
 
 void removerTodos (noAVL **raiz);
@@ -170,7 +172,7 @@ int main () {
 		          break;
 		case '2': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                 // remover (&arvoreAvl, cod);
+                  remover (&arvoreAvl, cod);
                   break;
 		case '3': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
@@ -372,6 +374,30 @@ void inserir (noAVL **raiz,char codigo[], int *status){
                         break;
 		}
 	}
+}
+
+void remover(noAVL **raiz, int codigo[]) {
+    if (*raiz == NULL)
+       printf("Elemento não encontrado.\n");
+    else if (strcmp(codigo, (*raiz)->cod) == 0) {
+       remover_no(raiz);
+    }
+    else if (strcmp(codigo, (*raiz)->cod) < 0) {
+       remover(&((*raiz)->esq),codigo);
+         switch ((*raiz)->fatbal) {
+             case -1 : (*raiz)->fatbal = 0; break;
+             case 0 : (*raiz)->fatbal = 1; break;
+             case 1 : rotacaoEsqRem(raiz); break;
+         }
+    }
+    else {
+       remover(&((*raiz)->dir),codigo);
+         switch ((*raiz)->fatbal) {
+             case 1 : (*raiz)->fatbal = 0; break;
+             case 0 : (*raiz)->fatbal = -1; break;
+             case -1 : rotacaoDirRem(raiz); break;
+         }
+    }
 }
 
 void removeAll(noAVL **raiz){
