@@ -41,6 +41,14 @@ typedef struct noAvl {
 
 noAVL * CriarNo (char codigo[]);
 
+void LL(noAVL** r);
+
+void LR(noAVL** r);
+
+void RR(noAVL** r);
+
+void RL(noAVL** r);
+
 void inserir (noAVL **raiz,char codigo[], int *status);
 
 void removeAll(noAVL **raiz);
@@ -217,13 +225,85 @@ noAVL * CriarNo (char codigo[]){
 	return raiz;
 }
 
+void LL(noAVL** r) {
+	noAVL* b = *r;
+	noAVL* a = b->esq;
+	b->esq = a->dir;
+	a->dir = b;
+	a->fatbal = 0;
+	b->fatbal = 0;
+	*r = a;
+}
+
+void LR(noAVL** r) {
+	noAVL *a = *r;
+	noAVL *b = a->esq;
+	noAVL *c = b->dir;
+	a->esq = c->dir;
+	b->dir = c->esq;
+	c->esq = b;
+	c->dir = a;
+	switch (c->fatbal) {
+	case -1:
+		b->fatbal = 0;
+		a->fatbal = 1;
+		break;
+	case 0:
+		b->fatbal = 0;
+		a->fatbal = 0;
+		break;
+	case +1:
+		b->fatbal = -1;
+		a->fatbal = 0;
+		break;
+	}
+	c->fatbal = 0;
+	*r = c;
+}
+
+void RR(noAVL** r) {
+	noAVL* a = *r;
+	noAVL* b = a->dir;
+	a->dir = b->esq;
+	b->esq = a;
+	a->fatbal = 0;
+	b->fatbal = 0;
+	*r = b;
+}
+
+void RL(noAVL** r) {
+	noAVL *a = *r;
+	noAVL *c = a->dir;
+	noAVL *b = c->esq;
+	c->esq = b->dir;
+	a->dir = b->esq;
+	b->esq = a;
+	b->dir = c;
+	switch (b->fatbal) {
+	case -1:
+		a->fatbal = 0;
+		c->fatbal = 1;
+		break;
+	case 0:
+		a->fatbal = 0;
+		c->fatbal = 0;
+		break;
+	case +1:
+		a->fatbal = -1;
+		c->fatbal = 0;
+		break;
+	}
+	b->fatbal = 0;
+	*r = b;
+}
+
 void inserir (noAVL **raiz,char codigo[], int *status){
 
 	if (*raiz == NULL){
 		*raiz = CriarNo (codigo);
 		*status = 1;
 	}
-	else if (strcmp(codigo, (*raiz)->cod) == 0) { // tirar duvida (*raiz)->cod  e não raiz->cod
+	else if (strcmp(codigo, (*raiz)->cod) == 0) {
 		printf ("Codigo de produto repetido! \n");
 		return;
 	}
@@ -236,7 +316,11 @@ void inserir (noAVL **raiz,char codigo[], int *status){
 		                  break;
 		         case 0 : (*raiz)->fatbal = -1;
 		                  break;
-		         //case -1 : rotacaoDir(raiz, status);
+		         case -1 : if((*raiz)->esq->fatbal == -1 )
+		        	           LL(raiz);                   // rotação simples a direita  LL = Left Left - direção dos filhos de 'A'
+		                   else
+		                	   LR(raiz);                   // rotação dupla a esquerda   LR = Left Right - direção dos filhos de 'A'
+		                   *status = 0;                        //alteração de status fora dos procedimentos de rotação
 		                   break;
 		       }
 	}
@@ -249,7 +333,11 @@ void inserir (noAVL **raiz,char codigo[], int *status){
 		                break;
 		       case 0 : (*raiz)->fatbal = 1;
                         break;
-		       //case 1 : rotacaoEsq(raiz, status);
+		       case 1 : if((*raiz)->dir->fatbal == 1)
+		    	           RR(raiz);                     // rotação simples a esquerda RR = Right Right - direção dos filhos de 'A'
+		                else
+		                   RL(raiz);                     //rotação dupla a esquerda    RL = Right Left - direção dos filhos de 'A'
+		                *status = 0;                     //alteração de status fora dos procedimentos de rotação
                         break;
 		}
 	}
