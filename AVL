@@ -6,7 +6,7 @@
  Copyright   : Your copyright notice
  Description : Hello World in C, Ansi-style
  ============================================================================
-2 *  Arvore AVL
+2 *  �?rvore AVL
  *  (Adelson-Velskii e Landis)
  *
  *  Fator de balanceamento = hdir - hesq
@@ -16,7 +16,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
+typedef struct noQueue {
+int info;
+struct noQueue * prox;
+} NoQueue;
+
+typedef struct descritor {
+NoQueue * inicio, * fim;
+}Descritor;
+
+typedef Descritor * Queue;
+
+//Queue filaBanco;                                           revisar
 
 typedef struct noAvl {
 	char cod [10], desc [100];
@@ -26,48 +39,56 @@ typedef struct noAvl {
 	int fatbal;
 }noAVL;
 
-int cont = 0; //contador de nós na arvore - variavel global ou nao - usar na queue para fazer a busca por nivel
+noAVL * CriarNo (char codigo[]);
 
-void percorrerPorNivel(noAVL * raiz) {   //percorrer por nivel - implementar funções de queue
-   Queue fila;
-   noAVL * aux;
-   if (raiz != NULL) {
-     initialize(&fila);
-     enqueue (fila,raiz);
+void inserir (noAVL **raiz,char codigo[], int *status);
 
-     while (isEmpty(fila) == false) {
-         aux = dequeue(fila);
+void removeAll(noAVL **raiz);
+
+void removerTodos (noAVL **raiz);
+
+void emOrdem (noAVL * raiz);
+
+/*void percorrerPorNivel(noAVL * raiz) {
+  Queue * fila;
+  noAVL * aux;
+  if (raiz != NULL) {
+      //initialize(&fila);
+     // enqueue (fila,raiz);
+      //while (!isEmpty(fila)) {                    //stdbool
+        // aux = dequeue(fila);
          if (aux->esq != NULL)
-            enqueue(fila,aux->esq);
+        // enqueue(fila,aux->esq);
          if (aux->dir != NULL)
-            enqueue(fila,aux->dir);
-            printf(“%i \n”, aux->info);
-          }
-     }
+        // enqueue(fila,aux->dir);
+         printf("%s \n", aux->cod);
+         }
 }
+
 
 noAVL * CriarNo (char codigo[]){
 	noAVL *raiz;
 	char info [100];
 	raiz = (noAVL *)malloc(sizeof(noAVL));
-	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;                               
+	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;
 	raiz->esq = NULL;
 	raiz->dir = NULL;
 	raiz->fatbal = 0;
 	printf("Descreva o produto: \n");
-	fgets (info, sizeof(info), stdin);                 
-	strcpy(raiz->desc, info);                          //raiz->desc = info;               
+	fgets (info, sizeof(info), stdin);
+	strcpy(raiz->desc, info);                          //raiz->desc = info;
 	printf("Digite o preco do produto: \n");
 	scanf("%f", &raiz->preco); fflush (stdin);
 	printf("Quantidade do produto em estoque: \n");
 	scanf("%d", &raiz->estoque); fflush (stdin);
 	return raiz;
 }
-void inserir (noAVL **raiz,char codigo[], int *status, int *cont){
+
+void inserir (noAVL **raiz,char codigo[], int *status){
+
 	if (*raiz == NULL){
 		*raiz = CriarNo (codigo);
 		*status = 1;
-		*cont++
 	}
 	else if (strcmp(codigo, (*raiz)->cod) == 0) { // tirar duvida (*raiz)->cod  e não raiz->cod
 		printf ("Codigo de produto repetido! \n");
@@ -82,61 +103,177 @@ void inserir (noAVL **raiz,char codigo[], int *status, int *cont){
 		                  break;
 		         case 0 : (*raiz)->fatbal = -1;
 		                  break;
-		         case -1 : rotacaoDir(raiz, status);
+		         //case -1 : rotacaoDir(raiz, status);
 		                   break;
 		       }
 	}
 	else {
 		inserir (&(*raiz)->dir, codigo, status);
-		     if (*status == 1);
+		     if (*status == 1)
 		       switch ((*raiz)->fatbal) {
 		       case -1 : (*raiz)->fatbal = 0;
 		                *status = 0;
 		                break;
 		       case 0 : (*raiz)->fatbal = 1;
                         break;
-		       case 1 : rotacaoEsq(raiz, status);
+		       //case 1 : rotacaoEsq(raiz, status);
                         break;
 		}
 	}
 }
 
-int main (){
+void removeAll(noAVL **raiz){
+     noAVL * pos;
+     pos = *raiz;
+     *raiz = NULL;
+     free (pos);
+}
+
+void removerTodos (noAVL **raiz) {
+    if (*raiz != NULL) {
+        removerTodos(&(*raiz)->esq);
+        removerTodos(&(*raiz)->dir);
+        removeAll(&(*raiz));   //printf(“%i \n”, raiz->cod);
+        }
+}
+*/
+
+int main () {
 	noAVL * arvoreAvl = NULL;
 	char op;
 	char cod[10];
 	int status = 0;
-	
+	system ("cls");
 	do {
-		printf ("1- Inserir \n2 - Remover \n3- Exibir \n4- Alterar \n5- Listar \n6- Sair \n");
+		printf ("1 - Inserir \n");
+		printf ("2 - Remover \n");
+		printf ("3- Exibir \n");
+		printf ("4- Alterar \n");
+		printf ("5- Listar \n");
+		printf ("6- Sair \n");          //teste
 		printf ("imforme a opcao: ");
-		op = getchar(); fflush(stdin);
+		op = getchar(); fflush (stdin);
 		switch(op){
-		case '1': printf ("Imforme o codigo: ");
+		case '1': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-		          inserir (&arvoreAvl, cod, &status, &cont);
+		          inserir (&arvoreAvl, cod, &status);
 		          break;
-		case '2': printf ("Imforme o codigo: ");
+		case '2': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  remover (&arvoreAvl, cod);
+                 // remover (&arvoreAvl, cod);
                   break;
-		case '3': printf ("Imforme o codigo: ");
+		case '3': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  exibir (&arvoreAvl, cod, &status);
+                  //exibir (&arvoreAvl, cod, &status);
                   break;
-		case '4': printf ("Imforme o codigo: ");
+		case '4': printf ("\n - Imforme o codigo: ");
                   fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  alterar (&arvoreAvl, cod, &status);
+                  //alterar (&arvoreAvl, cod, &status);
                   break;
-		case '5': porNivel (arvoreAvl);
+		case '5': emOrdem (arvoreAvl); //percorrerPorNivel (arvoreAvl);
                   break;
 		case '6': removerTodos (&arvoreAvl);
                   break;
 		default:  printf ("Opcao invalida \n");
 		}
 
-	}while (op =! '6');
+	}while (op != '6');
 	system ("pause");
 	return 0;
 }
 
+/*void percorrerPorNivel(noAVL * raiz) {
+  Queue * fila;
+  noAVL * aux;
+  if (raiz != NULL) {
+      //initialize(&fila);
+     // enqueue (fila,raiz);
+      //while (!isEmpty(fila)) {                    //stdbool
+        // aux = dequeue(fila);
+         if (aux->esq != NULL)
+        // enqueue(fila,aux->esq);
+         if (aux->dir != NULL)
+        // enqueue(fila,aux->dir);
+         printf("%s \n", aux->cod);
+         }
+}
+*/
+
+noAVL * CriarNo (char codigo[]){
+	noAVL *raiz;
+	char info [100];
+	raiz = (noAVL *)malloc(sizeof(noAVL));
+	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;
+	raiz->esq = NULL;
+	raiz->dir = NULL;
+	raiz->fatbal = 0;
+	printf("Descreva o produto: \n");
+	fgets (info, sizeof(info), stdin);
+	strcpy(raiz->desc, info);                          //raiz->desc = info;
+	printf("Digite o preco do produto: \n");
+	scanf("%f", &raiz->preco); fflush (stdin);
+	printf("Quantidade do produto em estoque: \n");
+	scanf("%d", &raiz->estoque); fflush (stdin);
+	return raiz;
+}
+
+void inserir (noAVL **raiz,char codigo[], int *status){
+
+	if (*raiz == NULL){
+		*raiz = CriarNo (codigo);
+		*status = 1;
+	}
+	else if (strcmp(codigo, (*raiz)->cod) == 0) { // tirar duvida (*raiz)->cod  e não raiz->cod
+		printf ("Codigo de produto repetido! \n");
+		return;
+	}
+	else if (strcmp(codigo, (*raiz)->cod) < 0) {
+		inserir (&(*raiz)->esq, codigo, status);
+		     if (*status == 1)
+		       switch ((*raiz)->fatbal) {
+		         case 1 : (*raiz)->fatbal = 0;
+		                  *status = 0;
+		                  break;
+		         case 0 : (*raiz)->fatbal = -1;
+		                  break;
+		         //case -1 : rotacaoDir(raiz, status);
+		                   break;
+		       }
+	}
+	else {
+		inserir (&(*raiz)->dir, codigo, status);
+		     if (*status == 1)
+		       switch ((*raiz)->fatbal) {
+		       case -1 : (*raiz)->fatbal = 0;
+		                *status = 0;
+		                break;
+		       case 0 : (*raiz)->fatbal = 1;
+                        break;
+		       //case 1 : rotacaoEsq(raiz, status);
+                        break;
+		}
+	}
+}
+
+void removeAll(noAVL **raiz){
+     noAVL * pos;
+     pos = *raiz;
+     *raiz = NULL;
+     free (pos);
+}
+
+void removerTodos (noAVL **raiz) {
+    if (*raiz != NULL) {
+        removerTodos(&(*raiz)->esq);
+        removerTodos(&(*raiz)->dir);
+        removeAll(&(*raiz));   //printf(“%i \n”, raiz->cod);
+        }
+}
+
+void emOrdem (noAVL * raiz) {
+    if (raiz != NULL) {
+        emOrdem(raiz->esq);
+        printf("%s \n", raiz->cod);
+        emOrdem(raiz->dir);
+        }
+}
