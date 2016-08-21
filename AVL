@@ -49,6 +49,8 @@ void RR(noAVL** r);
 
 void RL(noAVL** r);
 
+void LLRem(noAVL** r);
+
 void inserir (noAVL **raiz,char codigo[], int *status);
 
 void removeAll(noAVL **raiz);
