@@ -297,6 +297,35 @@ void RL(noAVL** r) {
 	*r = b;
 }
 
+void LLRem(noAVL** r) {
+	noAVL* a = *r;
+	noAVL* b = a->esq;
+	a->esq = b->dir;
+	b->dir = a;
+	if (b->fatbal == -1)
+		a->fatbal = 0;
+	else{
+		b->fatbal = 1;
+		a->fatbal = -1;
+	}
+	*r = b;
+}
+
+void rotacaoDirRem (noAVL ** raiz) {              //ta foda
+	noAVL * b, * c;
+	b = (*raiz)->esq;
+	if (b->fatbal == -1 || b->fatbal == 0) {
+		(*raiz)->esq = b->dir;
+		b->dir = (*raiz);
+		(*raiz)->fatbal = 0;
+		*raiz = b;
+	}
+	else {
+
+	}
+
+}
+
 void inserir (noAVL **raiz,char codigo[], int *status){
 
 	if (*raiz == NULL){
@@ -320,7 +349,7 @@ void inserir (noAVL **raiz,char codigo[], int *status){
 		        	           LL(raiz);                   // rotação simples a direita  LL = Left Left - direção dos filhos de 'A'
 		                   else
 		                	   LR(raiz);                   // rotação dupla a esquerda   LR = Left Right - direção dos filhos de 'A'
-		                   *status = 0;                        //alteração de status fora dos procedimentos de rotação
+		                   *status = 0;                    //alteração de status fora dos procedimentos de rotação
 		                   break;
 		       }
 	}
