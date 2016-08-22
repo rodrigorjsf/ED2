@@ -161,12 +161,12 @@ void removerTodos (noAVL **raiz) {
 */
 
 int main () {
-	noAVL * arvoreAvl = NULL;
+	noAVL * arvoreAvl = NULL, * aux;
 	char op;
 	char cod[10];
 	int status = 0;
-	system ("cls");
 	do {
+		system ("cls");
 		printf ("1 - Inserir \n");
 		printf ("2 - Remover \n");
 		printf ("3- Exibir \n");
@@ -190,7 +190,8 @@ int main () {
                   break;
 		case '4': printf ("\n - Imforme o codigo: ");
                   fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  //alterar (&arvoreAvl, cod, &status);
+                  aux = alterar (&arvoreAvl, cod);
+                  compare (&aux, &arvoreAvl, cod);
                   break;
 		case '5': emOrdem (arvoreAvl); //percorrerPorNivel (arvoreAvl);
                   break;
@@ -425,7 +426,6 @@ void exibir_no (noAVL **raiz) {
 }
 
 void exibir (noAVL **raiz, char codigo[]) {
-
 	if (*raiz == NULL)
 		printf ("Codigo de produto nao cadastrado! \n");
     else if (strcmp(codigo, (*raiz)->cod) == 0) {
@@ -436,6 +436,65 @@ void exibir (noAVL **raiz, char codigo[]) {
 		exibir (&(*raiz)->esq, codigo);
 	else
 		exibir (&(*raiz)->dir, codigo);
+}
+
+void trocar_cod_igual (noAVL ** raiz,noAVL ** arvore, char codigo[]){
+		if (*arvore == NULL)
+			printf ("Codigo de produto nao cadastrado! \n");
+	    else if (strcmp(codigo, (*arvore)->cod) == 0) {
+			*arvore = *raiz;
+		}
+		else if (strcmp(codigo, (*arvore)->cod) < 0)
+			trocar_cod_igual (&(*arvore)->esq, codigo);
+		else
+			trocar_cod_igual (&(*arvore)->dir, codigo);
+}
+
+void compare (noAVL **raiz, noAVL **arvore,char codigo[]){                      //PRECISA DA BUSCA
+	if(strcmp((*raiz)->cod, codigo) == 0)
+		trocar_cod_igual (raiz, arvore, codigo);
+	else
+
+		//CONTINUAR. ACHAR UM MODO DE BUSCAR O LOCAL DO NO E COLOCAR ELE LA. REMOVER NO ANTIGO TAMBEM
+
+}
+
+noAVL alterar_no (noAVL ** raiz) {
+	noAVL *aux;
+	char codigo[10], info [100];
+	char op;
+	aux = *raiz;                                               // para comparar o codigo
+		printf("Deseja alterar o codigo do produto? (s/n) \n");
+		scanf ("%c", &op); fflush (stdin);
+		if (op == 's' || op == 'S') {
+			printf("Digite o novo codigo do produto: \n");
+			fgets (codigo, sizeof(codigo), stdin);
+			strcpy (aux->cod, codigo);
+		}
+		else {
+		printf(" - Alteracao de informacoes do Produto - \n");
+		printf("Descreva o produto: \n");
+		fgets (info, sizeof(info), stdin);
+		strcpy(aux->desc, info);
+		printf("Digite o preco do produto: \n");
+		scanf("%f", &aux->preco); fflush (stdin);
+		printf("Quantidade do produto em estoque: \n");
+		scanf("%d", &aux->estoque); fflush (stdin);
+		}
+return aux;
+}
+
+noAVL alterar (noAVL **raiz, char codigo[]) {
+	noAVL * aux;
+	if (*raiz == NULL)
+		printf ("Codigo de produto nao cadastrado! \n");
+    else if (strcmp(codigo, (*raiz)->cod) == 0)
+		aux = alterar_no (raiz);
+	else if (strcmp(codigo, (*raiz)->cod) < 0)
+		exibir (&(*raiz)->esq, codigo);
+	else
+		exibir (&(*raiz)->dir, codigo);
+	return aux;
 }
 
 void inserir (noAVL **raiz,char codigo[], int *status){
