@@ -51,6 +51,16 @@ void RL(noAVL** r);
 
 void LLRem(noAVL** r);
 
+void LRRem (noAVL ** raiz);
+
+void RRRem(noAVL** r);
+
+void RLRem (noAVL ** raiz);
+
+void exibir_no (noAVL **raiz);
+
+void exibir (noAVL **raiz, char codigo[]);
+
 void inserir (noAVL **raiz,char codigo[], int *status);
 
 void remover(noAVL **raiz, int elem);
@@ -176,7 +186,7 @@ int main () {
                   break;
 		case '3': printf ("\n - Imforme o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  //exibir (&arvoreAvl, cod, &status);
+                  exibir (&arvoreAvl, cod);
                   break;
 		case '4': printf ("\n - Imforme o codigo: ");
                   fgets(cod, sizeof(cod), stdin); fflush (stdin);
@@ -301,7 +311,7 @@ void RL(noAVL** r) {
 	*r = b;
 }
 
-void LLRem(noAVL** r) {
+void LLRem(noAVL** r) {    // rotação simples a direita do REMOVER
 	noAVL* a = *r;
 	noAVL* b = a->esq;
 	a->esq = b->dir;
@@ -315,7 +325,83 @@ void LLRem(noAVL** r) {
 	*r = b;
 }
 
-void rotacaoDirRem (noAVL ** raiz) {              //ta foda
+void LRRem (noAVL ** raiz) {   // rotação dupla a direita do REMOVER
+	noAVL * b, * c;
+	  b = (*raiz)->esq;
+	  c = b->dir;
+      b->dir = c->esq;
+      c->esq = b;
+      (*raiz)->esq = c->dir;
+      c->dir = *raiz;
+      switch (c->fatbal) {
+            case 1: (*raiz)->fatbal = 0;
+                    b->fatbal = -1;
+                    break;
+            case 0: (*raiz)->fatbal = 0;            //duvida c->fatbal = 0
+          		    b->fatbal = 0;
+                    break;
+            case -1:(*raiz)->fatbal = 1;
+                    b->fatbal = 0;
+                    break;
+      }
+/*            if (c->fatbal == -1 || c->fatbal == 0)
+				  (*raiz)->fatbal = 1;
+            else
+				  (*raiz)->fatbal = 0;
+            if (c->fatbal == 1 || c->fatbal == 0)
+				  b->fatbal = -1;
+            else
+				  b->fatbal = 0;*/
+       *raiz = c;
+      (*raiz)->fatbal = 0;
+}
+
+void RRRem(noAVL** r) {    //rotacão simples a esquerda do REMOVER
+	noAVL* a = *r;
+	noAVL* b = a->dir;
+	a->dir = b->esq;
+	b->esq = a;
+	if (b->fatbal == 1)
+		a->fatbal = 0;
+	else{
+		a->fatbal = 1;
+		b->fatbal = -1;
+	}
+	*r = b;
+}
+
+void RLRem (noAVL ** raiz) {   // rotação dupla a Esquerda do REMOVER
+	noAVL * b, * c;
+	  b = (*raiz)->dir;
+	  c = b->esq;
+      b->esq = c->dir;
+      c->esq = b;
+      (*raiz)->esq = c->dir;
+      c->dir = *raiz;
+      switch (c->fatbal) {
+      case 1: (*raiz)->fatbal = -1;
+              b->fatbal = 0;
+              break;
+      case 0: (*raiz)->fatbal = 0;           //duvida c->fatbal = 0
+    		  b->fatbal = 0;
+              break;
+      case -1:(*raiz)->fatbal = 0;
+              b->fatbal = 1;
+              break;
+      }
+/*            if (c->fatbal == -1 || c->fatbal == 0)
+				  (*raiz)->fatbal = 1;
+            else
+				  (*raiz)->fatbal = 0;
+            if (c->fatbal == 1 || c->fatbal == 0)
+				  b->fatbal = -1;
+            else
+				  b->fatbal = 0;*/
+       *raiz = c;
+      (*raiz)->fatbal = 0;
+}
+
+/*void rotacaoDirRem (noAVL ** raiz) {              //ta foda
 	noAVL * b, * c;
 	b = (*raiz)->esq;
 	if (b->fatbal == -1 || b->fatbal == 0) {
@@ -328,6 +414,28 @@ void rotacaoDirRem (noAVL ** raiz) {              //ta foda
 
 	}
 
+}
+*/
+
+void exibir_no (noAVL **raiz) {
+	printf ("Produto: %s \n", raiz->desc);
+	printf ("Codigo: %s \n", raiz->cod);
+	printf ("Preco: %.2f \n", raiz->preco);
+	printf ("Em Estoque: %d \n", raiz->estoque);
+}
+
+void exibir (noAVL **raiz, char codigo[]) {
+
+	if (*raiz == NULL)
+		printf ("Codigo de produto nao cadastrado! \n");
+    else if (strcmp(codigo, (*raiz)->cod) == 0) {
+		exibir_no (raiz);
+		return;
+	}
+	else if (strcmp(codigo, (*raiz)->cod) < 0)
+		exibir (&(*raiz)->esq, codigo);
+	else
+		exibir (&(*raiz)->dir, codigo);
 }
 
 void inserir (noAVL **raiz,char codigo[], int *status){
@@ -387,7 +495,10 @@ void remover(noAVL **raiz, int codigo[]) {
          switch ((*raiz)->fatbal) {
              case -1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = 1; break;
-             case 1 : rotacaoEsqRem(raiz); break;
+             case 1 : if((*raiz)->dir->fatbal == 0 || (*raiz)->dir->fatbal == 1)   // rotacaoEsqRem(raiz); break;
+            	        RRRem(raiz);
+                      else
+                    	RLRem(raiz);
          }
     }
     else {
@@ -395,7 +506,10 @@ void remover(noAVL **raiz, int codigo[]) {
          switch ((*raiz)->fatbal) {
              case 1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = -1; break;
-             case -1 : rotacaoDirRem(raiz); break;
+             case -1 : if((*raiz)->esq->fatbal == -1 || (*raiz)->esq->fatbal == 0)  //rotacaoDirRem(raiz); break;
+            	         LLRem(raiz);
+                       else
+                    	 LRRem(raiz);
          }
     }
 }
