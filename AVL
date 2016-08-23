@@ -41,6 +41,10 @@ typedef struct noAvl {
 
 noAVL * CriarNo (char codigo[]);
 
+//void percorrerPorNivel(noAVL * raiz);
+
+int altura(noAVL* t);
+
 void LL(noAVL** r);
 
 void LR(noAVL** r);
@@ -61,9 +65,13 @@ void exibir_no (noAVL **raiz);
 
 void exibir (noAVL **raiz, char codigo[]);
 
+void alterar_no (noAVL ** raiz);
+
+void alterar (noAVL **raiz, char codigo[]);
+
 void inserir (noAVL **raiz,char codigo[], int *status);
 
-void remover(noAVL **raiz, int elem);
+void remover(noAVL **raiz, char codigo[]);
 
 void removeAll(noAVL **raiz);
 
@@ -161,7 +169,7 @@ void removerTodos (noAVL **raiz) {
 */
 
 int main () {
-	noAVL * arvoreAvl = NULL, * aux;
+	noAVL * arvoreAvl = NULL;
 	char op;
 	char cod[10];
 	int status = 0;
@@ -190,8 +198,7 @@ int main () {
                   break;
 		case '4': printf ("\n - Imforme o codigo: ");
                   fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  aux = alterar (&arvoreAvl, cod);
-                  compare (&aux, &arvoreAvl, cod);
+                  alterar (&arvoreAvl, cod);
                   break;
 		case '5': emOrdem (arvoreAvl); //percorrerPorNivel (arvoreAvl);
                   break;
@@ -203,6 +210,24 @@ int main () {
 	}while (op != '6');
 	system ("pause");
 	return 0;
+}
+
+noAVL * CriarNo (char codigo[]){
+	noAVL *raiz;
+	char info [100];
+	raiz = (noAVL *)malloc(sizeof(noAVL));
+	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;
+	raiz->esq = NULL;
+	raiz->dir = NULL;
+	raiz->fatbal = 0;
+	printf("Descreva o produto: \n");
+	fgets (info, sizeof(info), stdin);
+	strcpy(raiz->desc, info);                          //raiz->desc = info;
+	printf("Digite o preco do produto: \n");
+	scanf("%f", &raiz->preco); fflush (stdin);
+	printf("Quantidade do produto em estoque: \n");
+	scanf("%d", &raiz->estoque); fflush (stdin);
+	return raiz;
 }
 
 /*void percorrerPorNivel(noAVL * raiz) {
@@ -222,22 +247,12 @@ int main () {
 }
 */
 
-noAVL * CriarNo (char codigo[]){
-	noAVL *raiz;
-	char info [100];
-	raiz = (noAVL *)malloc(sizeof(noAVL));
-	strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;
-	raiz->esq = NULL;
-	raiz->dir = NULL;
-	raiz->fatbal = 0;
-	printf("Descreva o produto: \n");
-	fgets (info, sizeof(info), stdin);
-	strcpy(raiz->desc, info);                          //raiz->desc = info;
-	printf("Digite o preco do produto: \n");
-	scanf("%f", &raiz->preco); fflush (stdin);
-	printf("Quantidade do produto em estoque: \n");
-	scanf("%d", &raiz->estoque); fflush (stdin);
-	return raiz;
+int altura(noAVL* t) {
+	if (t == NULL)
+		return 0;
+	int hesq = altura(t->esq);
+	int hdir = altura(t->dir);
+	return hesq > hdir ? hesq + 1 : hdir + 1;
 }
 
 void LL(noAVL** r) {
@@ -345,14 +360,6 @@ void LRRem (noAVL ** raiz) {   // rotação dupla a direita do REMOVER
                     b->fatbal = 0;
                     break;
       }
-/*            if (c->fatbal == -1 || c->fatbal == 0)
-				  (*raiz)->fatbal = 1;
-            else
-				  (*raiz)->fatbal = 0;
-            if (c->fatbal == 1 || c->fatbal == 0)
-				  b->fatbal = -1;
-            else
-				  b->fatbal = 0;*/
        *raiz = c;
       (*raiz)->fatbal = 0;
 }
@@ -390,111 +397,55 @@ void RLRem (noAVL ** raiz) {   // rotação dupla a Esquerda do REMOVER
               b->fatbal = 1;
               break;
       }
-/*            if (c->fatbal == -1 || c->fatbal == 0)
-				  (*raiz)->fatbal = 1;
-            else
-				  (*raiz)->fatbal = 0;
-            if (c->fatbal == 1 || c->fatbal == 0)
-				  b->fatbal = -1;
-            else
-				  b->fatbal = 0;*/
        *raiz = c;
       (*raiz)->fatbal = 0;
 }
 
-/*void rotacaoDirRem (noAVL ** raiz) {              //ta foda
-	noAVL * b, * c;
-	b = (*raiz)->esq;
-	if (b->fatbal == -1 || b->fatbal == 0) {
-		(*raiz)->esq = b->dir;
-		b->dir = (*raiz);
-		(*raiz)->fatbal = 0;
-		*raiz = b;
-	}
-	else {
-
-	}
-
-}
-*/
-
-void exibir_no (noAVL **raiz) {
-	printf ("Produto: %s \n", raiz->desc);
-	printf ("Codigo: %s \n", raiz->cod);
-	printf ("Preco: %.2f \n", raiz->preco);
-	printf ("Em Estoque: %d \n", raiz->estoque);
+void exibir_no (noAVL **raiz) {               //testar depois de ter tirado os *
+	printf ("Produto: %s \n", (*raiz)->desc);
+	printf ("Codigo: %s \n", (*raiz)->cod);
+	printf ("Preco: %.2f \n", (*raiz)->preco);
+	printf ("Em Estoque: %d \n", (*raiz)->estoque);
 }
 
 void exibir (noAVL **raiz, char codigo[]) {
 	if (*raiz == NULL)
 		printf ("Codigo de produto nao cadastrado! \n");
-    else if (strcmp(codigo, (*raiz)->cod) == 0) {
+    else if (strcmp(codigo, (*raiz)->cod) == 0){
 		exibir_no (raiz);
 		return;
-	}
+    }
 	else if (strcmp(codigo, (*raiz)->cod) < 0)
 		exibir (&(*raiz)->esq, codigo);
 	else
 		exibir (&(*raiz)->dir, codigo);
 }
 
-void trocar_cod_igual (noAVL ** raiz,noAVL ** arvore, char codigo[]){
-		if (*arvore == NULL)
-			printf ("Codigo de produto nao cadastrado! \n");
-	    else if (strcmp(codigo, (*arvore)->cod) == 0) {
-			*arvore = *raiz;
-		}
-		else if (strcmp(codigo, (*arvore)->cod) < 0)
-			trocar_cod_igual (&(*arvore)->esq, codigo);
-		else
-			trocar_cod_igual (&(*arvore)->dir, codigo);
-}
-
-void compare (noAVL **raiz, noAVL **arvore,char codigo[]){                      //PRECISA DA BUSCA
-	if(strcmp((*raiz)->cod, codigo) == 0)
-		trocar_cod_igual (raiz, arvore, codigo);
-	else
-
-		//CONTINUAR. ACHAR UM MODO DE BUSCAR O LOCAL DO NO E COLOCAR ELE LA. REMOVER NO ANTIGO TAMBEM
-
-}
-
-noAVL alterar_no (noAVL ** raiz) {
-	noAVL *aux;
-	char codigo[10], info [100];
-	char op;
-	aux = *raiz;                                               // para comparar o codigo
-		printf("Deseja alterar o codigo do produto? (s/n) \n");
-		scanf ("%c", &op); fflush (stdin);
-		if (op == 's' || op == 'S') {
-			printf("Digite o novo codigo do produto: \n");
-			fgets (codigo, sizeof(codigo), stdin);
-			strcpy (aux->cod, codigo);
-		}
-		else {
+void alterar_no (noAVL ** raiz) {
+	char info [100];
 		printf(" - Alteracao de informacoes do Produto - \n");
 		printf("Descreva o produto: \n");
 		fgets (info, sizeof(info), stdin);
-		strcpy(aux->desc, info);
+		strcpy((*raiz)->desc, info);
 		printf("Digite o preco do produto: \n");
-		scanf("%f", &aux->preco); fflush (stdin);
+		scanf("%f", &(*raiz)->preco); fflush (stdin);
 		printf("Quantidade do produto em estoque: \n");
-		scanf("%d", &aux->estoque); fflush (stdin);
-		}
-return aux;
+		scanf("%d", &(*raiz)->estoque); fflush (stdin);
 }
 
-noAVL alterar (noAVL **raiz, char codigo[]) {
-	noAVL * aux;
+void alterar (noAVL **raiz, char codigo[]) {
 	if (*raiz == NULL)
 		printf ("Codigo de produto nao cadastrado! \n");
-    else if (strcmp(codigo, (*raiz)->cod) == 0)
-		aux = alterar_no (raiz);
+    else if (strcmp(codigo, (*raiz)->cod) == 0){
+		alterar_no (raiz);
+		printf ("Produto alterado com sucesso! \n");
+		system ("pause");
+		return;
+    }
 	else if (strcmp(codigo, (*raiz)->cod) < 0)
-		exibir (&(*raiz)->esq, codigo);
+		alterar (&(*raiz)->esq, codigo);
 	else
-		exibir (&(*raiz)->dir, codigo);
-	return aux;
+		alterar (&(*raiz)->dir, codigo);
 }
 
 void inserir (noAVL **raiz,char codigo[], int *status){
@@ -543,11 +494,60 @@ void inserir (noAVL **raiz,char codigo[], int *status){
 	}
 }
 
-void remover(noAVL **raiz, int codigo[]) {
+noAVL * maior(noAVL **raiz) {
+    noAVL *aux;
+    if ((*raiz)->dir == NULL) {
+        aux = *raiz;
+        *raiz = (*raiz)->esq;
+    }
+    else {
+        aux = maior(&((*raiz)->dir));
+           switch ((*raiz)->fatbal) {
+              case 1 : (*raiz)->fatbal = 0; break;
+              case 0 : (*raiz)->fatbal = -1; break;
+              case -1 : if((*raiz)->esq->fatbal == -1 || (*raiz)->esq->fatbal == 0)  //rotacaoDirRem(raiz); break;
+     	                   LLRem(raiz);
+                        else
+             	           LRRem(raiz);
+                        break;
+           }
+    }
+return aux;
+}
+
+void remover_no(noAVL **raiz) {
+     noAVL * pos;
+     pos = *raiz;
+     if ((*raiz)->esq == NULL && (*raiz)->dir == NULL) // Não tem filhos
+        *raiz = NULL;
+     else if ((*raiz)->esq == NULL) // Não tem filho a esquerda
+        *raiz = (*raiz)->dir;
+     else if ((*raiz)->dir == NULL) // Não tem filho a direita
+        *raiz = (*raiz)->esq;
+     else {                        // Tem ambos os filhos
+        pos = maior(&((*raiz)->esq));
+        strcpy((*raiz)->cod, pos->cod);
+        strcpy((*raiz)->desc, pos->desc);
+        (*raiz)->preco = pos->preco;
+        (*raiz)->estoque = pos->estoque;
+     }
+free (pos);
+}
+
+void remover(noAVL **raiz, char codigo[]) {
+	int altesq, altdir;
     if (*raiz == NULL)
        printf("Elemento não encontrado.\n");
-    else if (strcmp(codigo, (*raiz)->cod) == 0) {
+    else if (strcmp(codigo,(*raiz)->cod) == 0) {
        remover_no(raiz);
+       altesq = altura ((*raiz)->esq);                            //TIRAR DUVIDA
+       altdir = altura ((*raiz)->dir);
+              if (altdir - altesq == -1)
+                  (*raiz)->fatbal = -1;
+              else if (altdir - altesq == 0)
+            	  (*raiz)->fatbal = 0;
+              else
+            	  (*raiz)->fatbal = 1;
     }
     else if (strcmp(codigo, (*raiz)->cod) < 0) {
        remover(&((*raiz)->esq),codigo);
@@ -558,6 +558,7 @@ void remover(noAVL **raiz, int codigo[]) {
             	        RRRem(raiz);
                       else
                     	RLRem(raiz);
+                      break;
          }
     }
     else {
@@ -569,6 +570,7 @@ void remover(noAVL **raiz, int codigo[]) {
             	         LLRem(raiz);
                        else
                     	 LRRem(raiz);
+                       break;
          }
     }
 }
