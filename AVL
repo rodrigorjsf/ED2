@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <conio.h>
 #define TRUE 1
 #define FALSE 0
 
@@ -90,6 +91,7 @@ void removerTodos (noAVL **raiz);
 void emOrdem (noAVL * raiz);
 
 int main () {
+	system("color F0");
 	noAVL * arvoreAvl = NULL;
 	char op;
 	char cod[10];
