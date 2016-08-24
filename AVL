@@ -101,26 +101,26 @@ int main () {
 		printf ("-------------------- ARVORE AVL -------------------- \n");
 		printf ("1 - Inserir \n");
 		printf ("2 - Remover \n");
-		printf ("3- Exibir \n");
-		printf ("4- Alterar \n");
-		printf ("5- Listar \n");
-		printf ("6- Sair \n");          //teste
-		printf ("imforme a opcao: ");
+		printf ("3 - Exibir \n");
+		printf ("4 - Alterar \n");
+		printf ("5 - Listar \n");
+		printf ("6 - Sair \n");          //teste
+		printf ("informe a opcao: ");
 		op = getchar(); fflush (stdin);
 		switch(op){
-		case '1': printf ("\n - Imforme o codigo: ");
+		case '1': printf ("\n - Informe o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
 		          inserir (&arvoreAvl, cod, &status);
 		          break;
-		case '2': printf ("\n - Imforme o codigo: ");
+		case '2': printf ("\n - Informe o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
                   remover (&arvoreAvl, cod);
                   break;
-		case '3': printf ("\n - Imforme o codigo: ");
+		case '3': printf ("\n - Informe o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
                   exibir (arvoreAvl, cod);
                   break;
-		case '4': printf ("\n - Imforme o codigo: ");
+		case '4': printf ("\n - Informe o codigo: ");
                   fgets(cod, sizeof(cod), stdin); fflush (stdin);
                   alterar (&arvoreAvl, cod);
                   break;
