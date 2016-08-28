@@ -32,7 +32,25 @@ noAVL * CriarNo (char codigo[]){
 	return raiz;
 }
 
-
+int buscar (FILE * arq, char matAux[]) {
+    int cont = -1, status;
+    noAVL c;    //ponteiro ou nao?
+    fseek (arq, 0, 0);
+    while (1) {
+        status = fread (&c, sizeof (noAVL), 1, arq);
+        if (status != 1) {
+            if (!feof(arq))
+                return -2; // erro de leitura
+            else
+                return -1; // nao achou
+        }
+        else {
+            cont++;
+            if (c.status == 1 && strcmp (c.nome, nomeAux) == 0)
+                return cont;
+        }
+    }
+}
 
 int carregaArquivo(noAVL **raiz){
     int elemento;                          /* variavel do tipo inteiro*/
