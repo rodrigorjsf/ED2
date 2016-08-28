@@ -27,7 +27,7 @@ typedef struct descritor {
 typedef TDescritor * Queue;
 
 noAVL * CriarNo (char codigo[]);
-
+int buscar (FILE * arq, char matAux[]);
 int isEmpty (Queue fila);
 void enqueue (Queue fila, noAVL * n);
 noAVL * dequeue (Queue fila);
