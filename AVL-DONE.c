@@ -96,6 +96,7 @@ int main () {
 	char op;
 	char cod[10];
 	int status = 0;
+	c = 0;
 	do {
 		system ("cls");
 		printf ("-------------------- ARVORE AVL -------------------- \n");
@@ -114,7 +115,7 @@ int main () {
 		          break;
 		case '2': printf ("\n - Informe o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
-                  remover (&arvoreAvl, cod);
+                  remover (&arvoreAvl, cod, &c);
                   break;
 		case '3': printf ("\n - Informe o codigo: ");
 		          fgets(cod, sizeof(cod), stdin); fflush (stdin);
@@ -505,7 +506,7 @@ void remover_no(noAVL **raiz) {
 free (pos);
 }
 
-void remover(noAVL **raiz, char codigo[]) {
+void remover(noAVL **raiz, char codigo[], int * cont) {
 	int altesq, altdir;
     if (*raiz == NULL){
        printf("Elemento não encontrado.\n");
@@ -513,12 +514,7 @@ void remover(noAVL **raiz, char codigo[]) {
     }
     else if (strcmp(codigo,(*raiz)->cod) == 0) {
        remover_no(raiz);
-              if (*raiz == NULL){
-    	           printf("Produto deletado! \n");
-    	           system("pause");
-    	           return;
-              }
-              else {
+              if (cont == 0) {
                   altesq = altura ((*raiz)->esq);                            //TIRAR DUVIDA
                   altdir = altura ((*raiz)->dir);
             	  if (altdir - altesq == -1)
@@ -528,11 +524,15 @@ void remover(noAVL **raiz, char codigo[]) {
             	 else
             		  (*raiz)->fatbal = 1;
               }
+    	           printf("Produto deletado! \n");
+    	           system("pause");
+    	           return;
+              }
               printf("Produto deletado! \n");
               system ("pause");
     }
     else if (strcmp(codigo, (*raiz)->cod) < 0) {
-       remover(&((*raiz)->esq),codigo);
+       remover(&((*raiz)->esq),codigo, cont++);
          switch ((*raiz)->fatbal) {
              case -1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = 1; break;
@@ -544,7 +544,7 @@ void remover(noAVL **raiz, char codigo[]) {
          }
     }
     else {
-       remover(&((*raiz)->dir),codigo);
+       remover(&((*raiz)->dir),codigo, cont ++);
          switch ((*raiz)->fatbal) {
              case 1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = -1; break;
