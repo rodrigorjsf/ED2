@@ -105,6 +105,7 @@ int main () {
 	int status = 0;
 	int c = 0;
 	projeto = criarArquivo (nomeArq);
+	carregaArquivo(projeto, &arvoreAvl, &status);
 	if (projeto == NULL)
 			printf ("Erro ao tentar criar/abrir arquivo \n");
 	else {
@@ -116,13 +117,14 @@ int main () {
 		printf ("3 - Exibir \n");
 		printf ("4 - Alterar \n");
 		printf ("5 - Listar \n");
-		printf ("6 - Sair \n");          //teste
+		printf ("6 - Listar em ordem de matricula \n");
+		printf ("7 - Sair \n");          //teste
 		printf ("informe a opcao: ");
 		op = getchar(); fflush (stdin);
 		switch(op){
 		case '1': printf ("\n - Imforme a Matricula do aluno: ");
 		          fgets(mat, sizeof(mat), stdin); fflush (stdin);
-		          inserir (&arvoreAvl, mat, &status);
+		          inserir (projeto, &arvoreAvl, mat, &status);
 		          break;
 		case '2': printf ("\n - Imforme a Matricula do aluno: ");
 		          fgets(mat, sizeof(mat), stdin); fflush (stdin);
@@ -130,21 +132,24 @@ int main () {
                   break;
 		case '3': printf ("\n - Imforme a Matricula do aluno: ");
 		          fgets(mat, sizeof(mat), stdin); fflush (stdin);
-                  exibir (arvoreAvl, mat);
+                  exibir (projeto, arvoreAvl, mat);
                   break;
 		case '4': printf ("\n - Imforme a Matricula do aluno: ");
                   fgets(mat, sizeof(mat), stdin); fflush (stdin);
-                  alterar (&arvoreAvl, mat);
+                  alterar (projeto, &arvoreAvl, mat);
                   break;
-		case '5': percorrerPorNivel (arvoreAvl);
+		case '5': listarTodos (projeto); //percorrerPorNivel (arvoreAvl);
 		          system ("pause");
                   break;
-		case '6': removerTodos (&arvoreAvl);
+		case '6': ExibirEmOrdem (projeto, &arvoreAvl);
+		          system ("pause");
+                  break;
+		case '7': removerTodos (&arvoreAvl);
                   break;
 		default:  printf ("Opcao invalida \n");
 		}
 
-	}while (op != '6');
+	}while (op != '7');
 	system ("pause");
 	}
 	return 0;
