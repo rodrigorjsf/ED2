@@ -33,9 +33,6 @@ typedef struct descritor {
 
 typedef TDescritor * Queue;
 
-
-//noRB * CriarNo (int num);
-
 void LL(noRB ** r, noRB *k);
 void LR(noRB ** r, noRB *k);
 void RR(noRB ** r, noRB *k);
@@ -46,7 +43,6 @@ void removerP (noRB * raiz, int num);
 int isEmpty (Queue fila);
 void enqueue (Queue fila, noRB * n);
 noRB * dequeue (Queue fila);
-//int head (Queue fila);
 void initialize (Queue * fila);
 void percorrerPorNivel(noRB * raiz);
 void RBInsert (noRB **raiz, int elem);
@@ -64,8 +60,6 @@ int main(void) {
 		printf ("-------------------- ARVORE RED BLACK -------------------- \n");
 		printf ("1 - Inserir \n");
 		printf ("2 - Remover \n");
-		//printf ("3 - Exibir \n");
-		//printf ("4 - Alterar \n");
 		printf ("3 - Listar \n");
 		printf ("4 - Sair \n");
 		printf ("informe a opcao: ");
@@ -79,14 +73,6 @@ int main(void) {
 		          scanf ("%d", &num); fflush (stdin);
                   removerP (arvoreRB, num);
                   break;
-		/*case '3': printf ("\n - Informe o codigo: ");
-		          fgets(num, sizeof(num), stdin); fflush (stdin);
-                  exibir (arvoreAvl, num);
-                  break;
-		case '4': printf ("\n - Informe o codigo: ");
-                  fgets(num, sizeof(num), stdin); fflush (stdin);
-                  alterar (&arvoreAvl, num);
-                  break;*/
 		case '3': percorrerPorNivel (arvoreRB);
 		          system ("pause");
                   break;
@@ -281,13 +267,13 @@ void RBInsertFixup (noRB **raiz, noRB *k) {
 						break;
 					}
 				}
-				else { // s->cor == red
+				else { 
 					g = k->pai->pai;
 					recolorir(k);
 					k = g;
 					}
 			}
-			else { // tio S é o filho da esquerda
+			else { 
 				s = k->pai->pai->esq;
 				if (s == NULL || s->cor == black) {
 					if (k == k->pai->esq) {
@@ -299,35 +285,18 @@ void RBInsertFixup (noRB **raiz, noRB *k) {
 						break;
 					}
 				}
-				else { // s->cor == red
+				else { 
 					g = k->pai->pai;
 					recolorir(k);
 					k = g;
 					}
 			}
 		} // fim while
-		} // fim do if
+		} 
 	else
 		(*raiz)->cor = black;
 }
 
-/*noRB * CriarNo (int num){
-	noRB *raiz;
-	raiz = (noRB *)malloc(sizeof(noRB));
-	//strcpy (raiz->cod, codigo);                        //raiz->cod = codigo;
-	raiz->esq = NULL;
-	raiz->dir = NULL;
-	raiz->pai =
-	raiz->fatbal = 0;
-	printf("Descreva o produto: \n");
-	fgets (info, sizeof(info), stdin);
-	strcpy(raiz->desc, info);                          //raiz->desc = info;
-	printf("Digite o preco do produto: \n");
-	scanf("%f", &raiz->preco); fflush (stdin);
-	printf("Quantidade do produto em estoque: \n");
-	scanf("%d", &raiz->estoque); fflush (stdin);
-	return raiz;
-}*/
 
 noRB * buscar (noRB * raiz, int num) {
 	noRB * aux;
@@ -407,10 +376,6 @@ noRB * dequeue (Queue fila) {
      free (aux);
 return n;
 }
-
-/*int head (Queue fila) {
-  return fila->inicio->info;
-}*/
 
 void initialize (Queue * fila) {
      *fila = (TDescritor *) malloc (sizeof (TDescritor));
