@@ -1,57 +1,50 @@
-/*
- * AVL.c
- *
- *  Created on: 27 de ago de 2016
- *      Author: Rodrigo
- */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <conio.h>
-#include "AVL.h"
-#define TRUE 1
-#define FALSE 0
+#include "AvlArquivo.h"
 
-noAVL * CriarNo (FILE * projeto, char codigo[]){
+noAVL * CriarNo (char codigo[]){
+	FILE * projeto;
+	noARQ aux;
 	noAVL * raiz;
 	char info [100];
 	int status;
-
-	fseek (projeto, 0, 2);
+	projeto = fopen("Contato.txt", "a+b");
+	if (projeto == NULL)
+		return NULL;
 	raiz = (noAVL *)malloc(sizeof(noAVL));
 	strcpy (raiz->matricula, codigo);                        //raiz->cod = codigo;
+	strcpy (aux.matricula, codigo);
 	raiz->esq = NULL;
 	raiz->dir = NULL;
 	raiz->fatbal = 0;
-	raiz->status = 1;
+	aux.status = 1;
 	printf("Digite o nome do Aluno: \n");
 	fgets (info, sizeof(info), stdin);
-	strcpy(raiz->nome, info);                               //raiz->nome = info;
+	strcpy(aux.nome, info);//raiz->nome = info;
+	do{
 	printf("Digite a media do aluno: \n");
-	scanf("%f", &raiz->media); fflush (stdin);
+	scanf("%f", &aux.media); fflush (stdin);
+	if (aux.media > 10)
+		printf("Media invalida. Ex: de 0 a 10. \n");
+	}while (aux.media > 10);
 	printf("Quantidade de faltas do aluno: \n");
-	scanf("%d", &raiz->faltas); fflush (stdin);
-	status = fwrite(raiz,sizeof(noAVL),1,projeto);
-	if (status != 1){
+	scanf("%d", &aux.faltas); fflush (stdin);
+	status = fwrite(&aux,sizeof(noARQ),1,projeto);
+	if (status != 1)
 			printf ("Erro de gravacao \n");
-			system("pause");
-	}
-		else{
+		else
 			printf ("Contato cadastrado com sucesso \n");
-			system("pause");
-		}
+	system ("pause");
+	fclose(projeto);
 	return raiz;
 }
 
 int buscar (FILE * projeto, char matricula[]) {
 	int cont = -1, status;
-	noAVL c;
+	noARQ c;
 
 	fseek (projeto, 0, 0);
 	while (1) {
-		status = fread (&c, sizeof (noAVL), 1, projeto);
+		status = fread (&c, sizeof (noARQ), 1, projeto);
 		if (status != 1) {
 			if (!feof(projeto))
 			    return -2; // erro de leitura
@@ -60,89 +53,10 @@ int buscar (FILE * projeto, char matricula[]) {
 		}
 		else {
 			cont++;
-			if (c.status == 1 && strcmp (c.nome, matricula) == 0)
+			if (c.status == 1 && strcmp (c.matricula, matricula) == 0)
 				return cont;
 		}
 	}
-}
-
-int carregaArquivo(FILE * projeto, noAVL **raiz, int * status){
-	noAVL * aux;
-    fseek(projeto,0,SEEK_END);
-    if(ftell(projeto) == 0)              // FTELL retorna a posição corrente de leitura ou escrita no arquivo (em bytes). Se for 0, arquivo vazio
-    	return 0;
-    fseek(projeto,0,SEEK_SET);
-    if(projeto == NULL) {
-    	return 0;
-    }
-    else {
-    	while(!feof(projeto)) {
-    		fread (aux, sizeof(noAVL), 1, projeto);
-            inserir_do_Arq (&(*raiz),&aux, status);
-        }
-    	printf ("Arquivo carregado com sucesso!\n");
-        system("pause");
-        system("cls");
-    }
-    return 1;
-}
-
-int isEmpty (Queue fila) {
-    if (fila->inicio == NULL)
-       return TRUE;
-    else
-       return FALSE;
-}
-
-void enqueue (Queue fila, noAVL * n) {
-     TNo * novo;
-     novo = (TNo *) malloc (sizeof (TNo));
-     novo->info = n;
-     novo->prox = NULL;
-     if (isEmpty (fila) == TRUE)
-        fila->inicio = novo;
-     else
-        fila->fim->prox = novo;
-     fila->fim = novo;
-}
-
-noAVL * dequeue (Queue fila) {
-     TNo * aux;
-     noAVL * n;
-     aux = fila->inicio;
-     fila->inicio = fila->inicio->prox;
-     if (isEmpty (fila) == TRUE)
-        fila->fim = NULL;
-     n = aux->info;
-     free (aux);
-return n;
-}
-
-/*int head (Queue fila) {
-  return fila->inicio->info;
-}*/
-
-void initialize (Queue * fila) {
-     *fila = (TDescritor *) malloc (sizeof (TDescritor));
-     (*fila)->inicio = NULL;
-     (*fila)->fim = NULL;
-}
-
-void percorrerPorNivel(noAVL * raiz) {
-  Queue fila;
-  noAVL * aux;
-  if (raiz != NULL) {
-      initialize(&fila);
-      enqueue (fila, raiz);
-      while (isEmpty(fila) == FALSE) {                    //stdbool
-            aux = dequeue(fila);
-         if (aux->esq != NULL)
-           enqueue(fila,aux->esq);
-         if (aux->dir != NULL)
-           enqueue(fila,aux->dir);
-         printf("%s FB:%d \n", aux->matricula, aux->fatbal);
-         }
-  }
 }
 
 int altura(noAVL* t) {
@@ -299,165 +213,146 @@ void RLRem (noAVL ** raiz) {                     // rotação dupla a Esquerda d
       (*raiz)->fatbal = 0;
 }
 
-void exibir_noTodo (FILE * projeto, char matricula[]) {
-	noAVL aux;
+void exibir_no (char matricula[]) {
+	FILE * projeto;
+	noARQ aux;
 	int pos, status;
-	pos = buscar (projeto, matricula);
-	if (pos == -1)
-	    			printf ("Contato nao cadastrado \n");
-	    	else if (pos == -2)
-	    			printf ("Erro de leitura \n");
-	    	else {
-	    			fseek(projeto, pos * sizeof (noAVL), 0);   //duvida de fseek
-	    			status = fread (&aux,sizeof (noAVL), 1, projeto);
-	    			if (status != 1)
-	    				printf ("Erro de leitura \n");
-	    			else {
-	    				printf ("Aluno: %s \n", aux.nome);
-	    				printf ("Matricula: %s \n", aux.matricula);
-	    				printf ("Media do Aluno: %.2f \n", aux.media);
-	    				printf ("Quantidade de faltas do Aluno: %i \n\n", aux.faltas);
-	    			}
-	    		}
-}
-
-void exibir_no (FILE * projeto, char matricula[]) {
-	noAVL aux;
-	int pos, status;
-	pos = buscar (projeto, matricula);
-	if (pos == -1)
-	    			printf ("Contato nao cadastrado \n");
-	    	else if (pos == -2)
-	    			printf ("Erro de leitura \n");
-	    	else {
-	    			fseek(projeto, pos * sizeof (noAVL), 0);   //duvida de fseek
-	    			status = fread (&aux,sizeof (noAVL), 1, projeto);
-	    			if (status != 1)
-	    				printf ("Erro de leitura \n");
-	    			else {
-	    				printf ("Aluno: %s \n", aux.nome);
-	    				printf ("Media do Aluno: %.2f \n", aux.media);
-	    				printf ("Quantidade de faltas do Aluno: %i \n", aux.faltas);
-	    			}
-	    		}
-}
-
-void exibir (FILE * projeto, noAVL *raiz, char matricula[]) {
-	if (raiz == NULL){
-		printf ("Matricula de Aluno nao cadastrada! \n");
-		system ("pause");
-	}
-    else if (strcmp(matricula, raiz->matricula) == 0){
-    	exibir_no (projeto, matricula);
-		system ("pause");
+	projeto = fopen ("Contato.txt", "rb");
+	if (projeto == NULL)
 		return;
-    }
+	pos = buscar (projeto, matricula);
+	if (pos == -1)
+		printf ("Contato nao cadastrado \n");
+	else if (pos == -2)
+		printf ("Erro de leitura \n");
+	else {
+	    fseek(projeto, pos * sizeof (noARQ), 0);   //duvida de fseek
+	    status = fread (&aux,sizeof (noARQ), 1, projeto);
+		if (status != 1)
+			printf ("Erro de leitura \n");
+	    else {
+			printf ("Aluno: %s \n", aux.nome);
+			printf ("Media do Aluno: %.2f \n", aux.media);
+	    	printf ("Quantidade de faltas do Aluno: %i \n", aux.faltas);
+		}
+	}
+	fclose(projeto);
+}
+
+void exibir (noAVL *raiz, char matricula[]) {
+	if (raiz == NULL)
+		printf ("\nMatricula de Aluno nao cadastrada! \n");
+
+    else if (strcmp(matricula, raiz->matricula) == 0)
+    	exibir_no (matricula);
+
 	else if (strcmp(matricula, raiz->matricula) < 0)
 		exibir (raiz->esq, matricula);
 	else
 		exibir (raiz->dir, matricula);
+	system ("pause");
 }
 
-void alterar_no (FILE * projeto, char matricula[]) {
-	    noAVL aux;
-	    char op;
-		int pos, status;
-		pos = buscar (projeto, matricula);
-		if (pos == -1)
-			printf ("Contato nao cadastrado \n");
-		else if (pos == -2)
+void alterar_no (char matricula[]) {
+	FILE * projeto; 
+	noARQ aux;
+	char op;
+    int pos, status;
+	projeto = fopen ("Contato.txt", "r+b");
+	if (projeto == NULL)
+		return;
+	pos = buscar (projeto, matricula);
+	if (pos == -1)
+		printf ("Contato nao cadastrado \n");
+	else if (pos == -2)
+		printf ("Erro de leitura \n");
+	else {
+		fseek(projeto, pos * sizeof (noARQ), 0);
+		status = fread (&aux,sizeof (noARQ), 1, projeto);
+		if (status != 1)
 			printf ("Erro de leitura \n");
 		else {
-			fseek(projeto, pos * sizeof (noAVL), 0);
-			status = fread (&aux,sizeof (noAVL), 1, projeto);
-			if (status != 1)
-				printf ("Erro de leitura \n");
-			else {
-					 printf("1 - ALterar Media do aluno  \n");
-					 printf("2 - ALterar quantidade de faltas do aluno  \n");
-					 printf("3 - ALterar Media e quantidade de faltas do aluno  \n");
-					 op = getchar(); fflush (stdin);
-					    switch(op){
-					    case '1':printf ("Alteracao de dados de %s \n", aux.nome);
-					             printf ("Informe a nova media do Aluno: \n");
-					    		 gets (aux.media); fflush (stdin);
-					    		 fseek(projeto, -sizeof(noAVL), 1);
-					    		 status = fwrite (&aux,sizeof (noAVL), 1, projeto);
-					    		 if (status != 1)
-					    			 printf ("Erro de gravacao \n");
-					    		 else
-					    		 	 printf ("Contato alterado com sucesso \n");
-					             break;
-					    case '2':printf ("Alteracao de dados de %s \n", aux.nome);
-					             printf ("Informe a nova quantidade de faltas: \n");
-					    		 gets (aux.faltas); fflush (stdin);
-					    		 fseek(projeto, -sizeof(noAVL), 1);
-					    		 status = fwrite (&aux,sizeof (noAVL), 1, projeto);
-					    		 if (status != 1)
-					    			 printf ("Erro de gravacao \n");
-					    	     else
-					    			 printf ("Contato alterado com sucesso \n");
-					             break;
-						case '3':printf ("Alteracao de dados de %s \n", aux.nome);
-						         printf ("Informe a nova media do Aluno: \n");
-								 gets (aux.media); fflush (stdin);
-								 printf ("Informe a nova quantidade de faltas: \n");
-								 gets (aux.faltas); fflush (stdin);
-								 fseek(projeto, -sizeof(noAVL), 1);
-								 status = fwrite (&aux,sizeof (noAVL), 1, projeto);
-								 if (status != 1)
-									 printf ("Erro de gravacao \n");
-								 else
-									 printf ("Contato alterado com sucesso \n");
-					             break;
-						default: printf("Operador inválido\n");
-					    }
+			printf("1 - ALterar Media do aluno  \n");
+			printf("2 - ALterar quantidade de faltas do aluno  \n");
+			printf("3 - ALterar Media e quantidade de faltas do aluno  \n");
+			op = getchar(); fflush (stdin);
+			switch(op){
+			case '1':
+				printf ("Alteracao de dados de %s \n", aux.nome);
+				do{
+				printf ("Informe a nova media do Aluno: \n");
+				scanf("%f", &aux.media); fflush (stdin);
+				if (aux.media > 10)
+					printf("Media invalida. Ex: de 0 a 10. \n");
+				}while (aux.media > 10);
+				fseek(projeto, -sizeof(noARQ), 1);
+				status = fwrite (&aux,sizeof (noARQ), 1, projeto);
+				if (status != 1)
+					printf ("Erro de gravacao \n");
+				else
+					printf ("Media alterada com sucesso. \n");
+				break;
+			case '2':
+				printf ("Alteracao de dados de %s \n", aux.nome);
+				printf ("Informe a nova quantidade de faltas: \n");
+				scanf("%d", &aux.faltas); fflush (stdin);
+				fseek(projeto, -sizeof(noARQ), 1);
+				status = fwrite (&aux,sizeof (noARQ), 1, projeto);
+				if (status != 1)
+					printf ("Erro de gravacao \n");
+				else
+					printf ("Quantidade de faltas alterada com sucesso. \n");
+				break;
+			case '3':
+				printf ("Alteracao de dados de %s \n", aux.nome);
+				do{
+				printf ("Informe a nova media do Aluno: \n");
+				scanf("%f", &aux.media); fflush (stdin);
+				if (aux.media > 10)
+					printf("Media invalida. Ex: de 0 a 10. \n");
+				}while (aux.media > 10);
+				printf ("Informe a nova quantidade de faltas: \n");
+				scanf("%d", &aux.faltas); fflush (stdin);
+				fseek(projeto, -sizeof(noARQ), 1);
+				status = fwrite (&aux,sizeof (noARQ), 1, projeto);   //duvida &aux
+				if (status != 1)
+					printf ("Erro de gravacao \n");
+				else
+					printf ("Media e quantidade de faltas alterada com sucesso. \n");
+				break;
+			default: 
+				printf("Operador inválido\n");
 			}
-
 		}
-}
-
-
-	/*char info [100];
-		printf(" - Alteracao de informacoes do Aluno - \n");
-		printf("Descreva o produto: \n");
-		fgets (info, sizeof(info), stdin);
-		strcpy((*raiz)->nome, info);
-		printf("Digite o preco do produto: \n");
-		scanf("%f", &(*raiz)->media); fflush (stdin);
-		printf("Quantidade do produto em estoque: \n");
-		scanf("%d", &(*raiz)->faltas); fflush (stdin);
-}*/
-
-void alterar (FILE * projeto, noAVL **raiz, char matricula[]) {
-	if (*raiz == NULL){
-		printf ("Matricula de Aluno nao cadastrada! \n");
-		system ("pause");
 	}
-    else if (strcmp(matricula, (*raiz)->matricula) == 0){
-		alterar_no (projeto, matricula);
-		printf ("Registro de Aluno alterado com sucesso! \n");
-		system ("pause");
-		return;
-    }
-	else if (strcmp(matricula, (*raiz)->matricula) < 0)
-		alterar (&(*raiz)->esq, matricula);
-	else
-		alterar (&(*raiz)->dir, matricula);
+	system ("pause");
+	fclose(projeto);
 }
 
-void inserir (FILE * projeto, noAVL **raiz,char codigo[], int *status){
+void alterar (noAVL *raiz, char matricula[]) {
+	if (raiz == NULL)
+		printf ("\nMatricula de Aluno nao cadastrada! \n");
+    else if (strcmp(matricula, raiz->matricula) == 0)
+		alterar_no (matricula);
+	else if (strcmp(matricula, raiz->matricula) < 0)
+		alterar (raiz->esq, matricula);
+	else
+		alterar (raiz->dir, matricula);
+	system ("pause");
+}
+
+void inserir (noAVL **raiz,char codigo[], int *status){
 
 	if (*raiz == NULL){
 		*raiz = CriarNo (codigo);
 		*status = 1;
 	}
-	else if (strcmp(codigo, (*raiz)->matricula) == 0) {
-		printf ("Matricula de Aluno repetida! \n");
+	else if (strcmp(codigo, (*raiz)->matricula) == 0){
+		printf ("\nMatricula de Aluno repetida!\n");
 		system ("pause");
 	}
 	else if (strcmp(codigo, (*raiz)->matricula) < 0) {
-		inserir (projeto, &(*raiz)->esq, codigo, status);
+		inserir (&(*raiz)->esq, codigo, status);
 		     if (*status == 1)
 		       switch ((*raiz)->fatbal) {
 		         case 1 : (*raiz)->fatbal = 0;
@@ -474,7 +369,7 @@ void inserir (FILE * projeto, noAVL **raiz,char codigo[], int *status){
 		       }
 	}
 	else {
-		inserir (projeto, &(*raiz)->dir, codigo, status);
+		inserir (&(*raiz)->dir, codigo, status);
 		     if (*status == 1)
 		       switch ((*raiz)->fatbal) {
 		       case -1 : (*raiz)->fatbal = 0;
@@ -492,18 +387,56 @@ void inserir (FILE * projeto, noAVL **raiz,char codigo[], int *status){
 	}
 }
 
-void inserir_do_Arq (noAVL **raiz,noAVL **aux, int *status){
+void carregaArquivo(FILE * projeto, noAVL **raiz, int * status){
+	noARQ aux;
+	int statusA;
+    fseek(projeto,0,SEEK_END);
+    if(ftell(projeto) == 0)              // FTELL retorna a posição corrente de leitura ou escrita no arquivo (em bytes). Se for 0, arquivo vazio
+    	printf ("Arquivo Vazio.\n");
+    fseek(projeto,0,SEEK_SET);
+    if(projeto == NULL)
+    	printf ("Erro ao tentar carregar o arquivo. \n");
+    else {
+    	while(!feof(projeto)) {
+    		statusA = fread (&aux, sizeof(noARQ), 1, projeto);
+    		if (statusA != 1){
+    			if(!feof(projeto)){
+    				printf ("Erro ao carregar o Arquivo\n");
+    				break;
+    			}
+    			else
+    				break;
+    		}
+            inserir_do_Arq (&(*raiz), aux.matricula, status);
+    	}
+    	printf ("Arquivo carregado com sucesso!\n");
+    }
+    system ("pause");
+	fclose(projeto);
+}
+
+noAVL * mudaTipo (char matricula[]){
+	noAVL * raiz;
+	raiz = (noAVL *)malloc(sizeof(noAVL));
+	strcpy (raiz->matricula, matricula);                        //raiz->cod = codigo;
+	raiz->esq = NULL;
+	raiz->dir = NULL;
+	raiz->fatbal = 0;
+	return raiz;
+}
+
+void inserir_do_Arq (noAVL **raiz,char mat[], int *status){
 
 	if (*raiz == NULL){
-		*raiz = *aux;
+		*raiz = mudaTipo(mat);
 		*status = 1;
 	}
-	else if (strcmp((*aux)->matricula, (*raiz)->matricula) == 0) {
+	else if (strcmp(mat, (*raiz)->matricula) == 0){
 		printf ("Matricula de Aluno repetida! \n");
 		system ("pause");
 	}
-	else if (strcmp((*aux)->matricula, (*raiz)->matricula) < 0) {
-		inserir (&(*raiz)->esq, &(*aux), status);
+	else if (strcmp(mat, (*raiz)->matricula) < 0) {
+		inserir_do_Arq (&(*raiz)->esq, mat, status);
 		     if (*status == 1)
 		       switch ((*raiz)->fatbal) {
 		         case 1 : (*raiz)->fatbal = 0;
@@ -520,7 +453,7 @@ void inserir_do_Arq (noAVL **raiz,noAVL **aux, int *status){
 		       }
 	}
 	else {
-		inserir (&(*raiz)->dir, &(*aux), status);
+		inserir_do_Arq (&(*raiz)->dir, mat, status);
 		     if (*status == 1)
 		       switch ((*raiz)->fatbal) {
 		       case -1 : (*raiz)->fatbal = 0;
@@ -537,7 +470,6 @@ void inserir_do_Arq (noAVL **raiz,noAVL **aux, int *status){
 		}
 	}
 }
-
 
 noAVL * maior(noAVL **raiz) {
     noAVL *aux;
@@ -560,6 +492,37 @@ noAVL * maior(noAVL **raiz) {
 return aux;
 }
 
+void alterarStatus (char mat[]){
+	FILE * projeto;
+	noARQ aux;
+	int pos, status;
+	projeto = fopen ("Contato.txt", "r+b");
+	if (projeto == NULL)
+		return;
+	pos = buscar (projeto, mat);
+	if (pos == -1)
+		printf ("Contato nao cadastrado \n");
+	else if (pos == -2)
+		printf ("Erro de leitura \n");
+	else {
+		fseek(projeto, pos * sizeof (noARQ), 0);
+		status = fread (&aux,sizeof (noARQ), 1, projeto);
+		if (status != 1)
+			printf ("Erro de leitura \n");
+		else {
+			aux.status = 0;
+			fseek(projeto, -sizeof(noARQ), 1);
+			status = fwrite (&aux,sizeof (noARQ), 1, projeto);
+			if (status != 1)
+				printf ("Erro de gravacao \n");
+			else
+				printf ("Contato removido com sucesso \n");
+		}
+	}
+	system ("pause");
+	fclose (projeto);
+}
+
 void remover_no(noAVL **raiz) {
      noAVL * pos;
      pos = *raiz;
@@ -572,21 +535,20 @@ void remover_no(noAVL **raiz) {
      else {                        // Tem ambos os filhos
         pos = maior(&((*raiz)->esq));
         strcpy((*raiz)->matricula, pos->matricula);
-        strcpy((*raiz)->nome, pos->nome);
-        (*raiz)->media = pos->media;
-        (*raiz)->faltas = pos->faltas;
      }
 free (pos);
 }
 
-void remover(noAVL **raiz, char codigo[], int * cont) {
-	int altesq, altdir;
+void remover(noAVL **raiz, char matricula[], int * cont) {
+
     if (*raiz == NULL){
-       printf("Matricula nao encontrada.\n");
+       printf("\nMatricula nao encontrada.\n");
        system ("pause");
     }
-    else if (strcmp(codigo,(*raiz)->matricula) == 0) {
-       remover_no(raiz);
+    else if (strcmp(matricula,(*raiz)->matricula) == 0) {
+    	alterarStatus(matricula);
+    	remover_no(raiz);
+    	int altesq, altdir;
               if (cont == 0) {
                   altesq = altura ((*raiz)->esq);                            //TIRAR DUVIDA
                   altdir = altura ((*raiz)->dir);
@@ -597,11 +559,9 @@ void remover(noAVL **raiz, char codigo[], int * cont) {
             	 else
             		  (*raiz)->fatbal = 1;
               }
-              printf("Registro de Aluno Deletado! \n");
-              system ("pause");
     }
-    else if (strcmp(codigo, (*raiz)->matricula) < 0) {
-       remover(&((*raiz)->esq),codigo, cont++);
+    else if (strcmp(matricula, (*raiz)->matricula) < 0) {
+       remover(&((*raiz)->esq),matricula, cont++);
          switch ((*raiz)->fatbal) {
              case -1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = 1; break;
@@ -613,7 +573,7 @@ void remover(noAVL **raiz, char codigo[], int * cont) {
          }
     }
     else {
-       remover(&((*raiz)->dir),codigo, cont++);
+       remover(&((*raiz)->dir),matricula, cont++);
          switch ((*raiz)->fatbal) {
              case 1 : (*raiz)->fatbal = 0; break;
              case 0 : (*raiz)->fatbal = -1; break;
@@ -641,34 +601,115 @@ void removerTodos (noAVL **raiz) {
         }
 }
 
-void listarTodos (FILE * projeto) {
+void listarTodos () {
+	FILE * projeto;
 	int status;
-	noAVL c;
-
-	fseek (projeto, 0, 0);
+	noARQ aux;
+	projeto = fopen ("Contato.txt", "rb");
+	if (projeto == NULL)
+		return;
 	while (1) {
-		status = fread (&c, sizeof (noAVL), 1, projeto);
+		status = fread (&aux, sizeof (noARQ), 1, projeto);
 		if (status != 1) {
 			if (!feof(projeto))
 			    printf ("Erro de leitura \n");
 			break;
 		}
 		else {
-			if (c.status == 1) {
-				printf ("Matricula: %d \n", c.matricula);
-				printf ("Nome: %s \n", c.nome);
-				printf ("Media: %s \n", c.media);
-				printf ("Faltas: %s \n", c.faltas);
+			if (aux.status == 1) {
+				printf ("\nMatricula: %s", aux.matricula);
+				printf ("Nome: %s ", aux.nome);
+				printf ("Media: %.2f \n", aux.media);
+				printf ("Faltas: %d \n\n", aux.faltas);
 			}
 		}
 	}
+	fclose(projeto);
 }
 
+void exibir_noTodo (noAVL *raiz) {
+	FILE * projeto;
+	noARQ aux;
+	int pos, status;
+	char info[100];
+	projeto = fopen ("Contato.txt", "rb");
+	if (projeto == NULL)
+		return;
+	strcpy(info, raiz->matricula);
+	pos = buscar (projeto, info);
+	if (pos == -1)
+		printf ("Contato nao cadastrado \n");
+	else if (pos == -2)
+		printf ("Erro de leitura \n");
+	else {
+		fseek(projeto, pos * sizeof (noARQ), 0);   //duvida de fseek
+		status = fread (&aux,sizeof (noARQ), 1, projeto);
+		if (status != 1)
+			printf ("Erro de leitura \n");
+		else {
+			printf ("Aluno: %s \n", aux.nome);
+			printf ("Matricula: %s \n", aux.matricula);
+			printf ("Media do Aluno: %.2f \n", aux.media);
+			printf ("Quantidade de faltas do Aluno: %i \n", aux.faltas);
+		}
+	}
+	fclose(projeto);
+}
 
-void ExibirEmOrdem (FILE * projeto, noAVL **raiz) {
-    if (*raiz != NULL) {
-    	ExibirEmOrdem(projeto, &(*raiz)->esq);
-    	ExibirEmOrdem(projeto, &(*raiz)->dir);
-        exibir_noTodo(projeto, (*raiz)->matricula);   //printf(“%i \n”, raiz->cod);
+void ExibirEmOrdem (noAVL *raiz) {
+    if (raiz != NULL) {
+    	ExibirEmOrdem(raiz->esq);
+    	exibir_noTodo(raiz);   //printf(“%i \n”, raiz->cod);
+    	ExibirEmOrdem(raiz->dir);
         }
+}
+
+void manutencao () {
+	FILE * projeto;
+	int status;
+	noARQ sup;
+	FILE * aux;
+	projeto = fopen ("Contato.txt", "r+b");
+	if (projeto == NULL){
+		printf ("Erro ao executar o processo de manutenção do arquivo \n");
+	    fclose (projeto);
+	}
+	aux = fopen ("auxiliar", "w+b");
+	if (aux == NULL) {
+		printf ("Erro ao executar o processo de manutenção do arquivo \n");
+		fclose (projeto);
+	}
+	else {
+	    while (1) {
+		     status = fread (&sup, sizeof (noARQ), 1, projeto);
+		     if (status != 1) {
+			      if (!feof(projeto)) {
+			            printf ("Erro ao executar o processo de manutenção do arquivo \n");
+						fclose (projeto);
+						fclose (aux);
+						remove ("auxiliar");
+						return;
+				  }
+				  else
+			            break;
+		    }
+		    else {
+			    if (sup.status == 1) {
+				     status = fwrite (&sup, sizeof (noARQ), 1, aux);
+				     if (status != 1) {
+					    printf ("Erro ao executar o processo de manutenção do arquivo \n");
+					    fclose (projeto);
+					    fclose (aux);
+					    remove ("auxiliar");
+					    return;
+				     }
+			   }
+		   }
+	    }
+        fclose (projeto);
+	    fclose (aux);
+	    remove ("Contato.txt");
+	    rename ("auxiliar", "Contato.txt");
+   }
+	system ("pause");
 }
