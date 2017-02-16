@@ -11,7 +11,6 @@ typedef struct produto {
 
 void cadastrar (FILE * arq, char codAux[]);
 void alterar (FILE * arq, char codAux[]);
-int buscarPos (FILE * arq, char codAux[]);
 int buscar (FILE * arq, char codAux[]);
 void consultar (FILE * arq, char codAux[]);
 void remover (FILE * arq, char codAux[]);
